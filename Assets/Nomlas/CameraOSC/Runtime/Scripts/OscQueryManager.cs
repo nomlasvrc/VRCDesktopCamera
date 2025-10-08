@@ -51,7 +51,7 @@ namespace CameraOSC
 
             AddMethods();
 
-            uiManager.InitializeUI();
+            uiManager.Initialize();
         }
 
         #region Sub Methods

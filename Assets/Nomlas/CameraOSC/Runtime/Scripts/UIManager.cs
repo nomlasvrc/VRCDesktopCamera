@@ -55,6 +55,7 @@ namespace CameraOSC
         #region Private Fields
         private UserCamera userCamera;
         private int lastSentZoom = 0;
+        private Vector3 lastPosition = Vector3.zero;
 
         #endregion
 
@@ -97,13 +98,9 @@ namespace CameraOSC
         #endregion
 
         #region Private Methods
-        internal void InitializeUI()
+        internal void Initialize()
         {
             userCamera = oscQueryManager.userCamera;
-
-            positionXText.text = userCamera.Position.x.ToString("F2");
-            positionYText.text = userCamera.Position.y.ToString("F2");
-            positionZText.text = userCamera.Position.z.ToString("F2");
         }
 
         private void m_UpdateSpoutSource()
@@ -131,15 +128,24 @@ namespace CameraOSC
         private void Update()
         {
             UpdateUIText();
-            MoveCamera();
         }
 
         private void UpdateUIText()
         {
-            poseText.text = $"Position: {userCamera.Position}\nRotation: {userCamera.Rotation}";
+            var pos = userCamera.Position;
+            if (pos != lastPosition)
+            {
+                poseText.text = $"Position: {pos}\nRotation: {userCamera.Rotation}";
+                positionXText.SetTextWithoutNotify(pos.x.ToString("F2"));
+                positionYText.SetTextWithoutNotify(pos.y.ToString("F2"));
+                positionZText.SetTextWithoutNotify(pos.z.ToString("F2"));
+                lastPosition = pos;
+            }
+
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
         }
 
+        /*
         private void MoveCamera()
         {
             float dx = Input.GetAxis("Horizontal");
@@ -152,6 +158,7 @@ namespace CameraOSC
                 userCamera.Send(pos, userCamera.Rotation);
             }
         }
+        */
         #endregion
     }
 }
