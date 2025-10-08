@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using OscCore;
-using TMPro;
 using UnityEngine;
 using VRC.OSCQuery;
 
@@ -9,13 +8,12 @@ namespace CameraOSC
 {
     public class OscQueryManager : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI infoText;
-        [SerializeField] private DataReceivable dataReceiver;
+        [SerializeField] private UIManager uiManager;
 
         private OSCQueryService _oscQuery;
         private OscServer _receiver;
         internal UserCamera userCamera { get; private set; }
-        private const string SERVER_NAME = "CameraOSC";
+        private const string SERVER_NAME = "VRCDesktopCamera";
         internal static int portTCP = 9458;
         internal static int portUDP = 9459;
 
@@ -24,7 +22,7 @@ namespace CameraOSC
             StartService();
         }
 
-        private void StartService()
+        internal void StartService()
         {
             portTCP = GetAvailableTcpPort();
             portUDP = GetAvailableUdpPort();
@@ -49,11 +47,11 @@ namespace CameraOSC
             _oscQuery.RefreshServices();
 
             // Show server name and chosen port
-            infoText.text = $"{SERVER_NAME} running at tcp:{portTCP} osc: {portUDP}";
+            uiManager.SetInfoText($"tcp: {portTCP}\nosc: {portUDP}");
 
             AddMethods();
 
-            dataReceiver.InitializeDataReceiver();
+            uiManager.InitializeUI();
         }
 
         #region Sub Methods

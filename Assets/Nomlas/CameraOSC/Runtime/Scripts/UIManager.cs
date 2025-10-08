@@ -1,19 +1,71 @@
+using Klak.Spout;
+using TMPro;
 using UnityEngine;
 using TMPUI = TMPro.TextMeshProUGUI;
 
 namespace CameraOSC
 {
-    public class UIManager : DataReceivable
+    public interface IUIManager
     {
+        void SetInfoText(string text);
+        void Capture();
+        void UpdateSpoutSource();
+        float Zoom { set; }
+    }
+
+    public class UIManager : MonoBehaviour, IUIManager
+    {
+        #region Inspector
         [SerializeField] private OscQueryManager oscQueryManager;
-        private UserCamera userCamera;
+        [SerializeField] private SpoutReceiver spoutReceiver;
+        [Space]
+        [SerializeField] private TMPUI infoText;
         [Space]
         [SerializeField] private TMPUI poseText;
         [SerializeField] private TMPUI zoomText;
+        [Space]
+        [SerializeField] private TMP_InputField positionXText;
+        [SerializeField] private TMP_InputField positionYText;
+        [SerializeField] private TMP_InputField positionZText;
+        [Space]
+        [SerializeField] private TMP_Dropdown selectSourceDropdown;
+        #endregion
 
-        [SerializeField] private TMPUI positionXText;
-        [SerializeField] private TMPUI positionYText;
-        [SerializeField] private TMPUI positionZText;
+        #region UI Properties
+        public float Zoom
+        {
+            set
+            {
+                var v = Mathf.RoundToInt(value);
+                if (lastSentZoom == v) return;
+                userCamera.Send(UserCamera.FloatEndPoint.Zoom, v);
+                lastSentZoom = v;
+            }
+        }
+        #endregion
+
+        #region Properties
+        public string sourceName
+        {
+            get => spoutReceiver.sourceName;
+            set => spoutReceiver.sourceName = value;
+        }
+        #endregion
+
+        #region Private Fields
+        private UserCamera userCamera;
+        private int lastSentZoom = 0;
+
+        #endregion
+
+        #region Public Methods
+        public void SetInfoText(string text)
+        {
+            infoText.text = text;
+        }
+        #endregion
+
+        #region UI Callbacks
         public void OnChangePositionX(string value)
         {
             Vector3 pos = userCamera.Position;
@@ -32,8 +84,20 @@ namespace CameraOSC
             pos.z = float.Parse(value);
             userCamera.Send(pos, userCamera.Rotation);
         }
+        public void Capture()
+        {
+            userCamera.Send(UserCamera.CameraAction.Capture);
+        }
 
-        public override void InitializeDataReceiver()
+        /// <summary>
+        /// Spoutのソースリストを更新
+        /// GC Allocが発生するので頻繁に呼ばないこと
+        /// </summary>
+        public void UpdateSpoutSource() => m_UpdateSpoutSource();
+        #endregion
+
+        #region Private Methods
+        internal void InitializeUI()
         {
             userCamera = oscQueryManager.userCamera;
 
@@ -42,11 +106,42 @@ namespace CameraOSC
             positionZText.text = userCamera.Position.z.ToString("F2");
         }
 
+        private void m_UpdateSpoutSource()
+        {
+            var sources = SpoutManager.GetSourceNames();
+
+            if (sources.Length > 0)
+            {
+                selectSourceDropdown.interactable = true;
+                selectSourceDropdown.ClearOptions();
+                selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string>(sources));
+                int currentIndex = System.Array.IndexOf(sources, spoutReceiver.sourceName);
+                if (currentIndex < 0) currentIndex = 0;
+                selectSourceDropdown.value = currentIndex;
+                spoutReceiver.sourceName = sources[currentIndex];
+            }
+            else
+            {
+                selectSourceDropdown.interactable = false;
+                selectSourceDropdown.ClearOptions();
+                selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string> { "No Source" });
+            }
+        }
+
         private void Update()
+        {
+            UpdateUIText();
+            MoveCamera();
+        }
+
+        private void UpdateUIText()
         {
             poseText.text = $"Position: {userCamera.Position}\nRotation: {userCamera.Rotation}";
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
+        }
 
+        private void MoveCamera()
+        {
             float dx = Input.GetAxis("Horizontal");
             float dy = Input.GetAxis("Vertical");
             if (dx != 0 || dy != 0)
@@ -57,22 +152,6 @@ namespace CameraOSC
                 userCamera.Send(pos, userCamera.Rotation);
             }
         }
-
-        public void Capture()
-        {
-            userCamera.Send(UserCamera.CameraAction.Capture);
-        }
-
-        public float Zoom
-        {
-            set
-            {
-                var v = Mathf.RoundToInt(value);
-                if (lastSentZoom == v) return;
-                userCamera.Send(UserCamera.FloatEndPoint.Zoom, v);
-                lastSentZoom = v;
-            }
-        }
-        private int lastSentZoom = 0;
+        #endregion
     }
 }
