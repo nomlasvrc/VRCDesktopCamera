@@ -1,7 +1,10 @@
 using Klak.Spout;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPUI = TMPro.TextMeshProUGUI;
+
+// UI管理クラス
 
 namespace CameraOSC
 {
@@ -13,7 +16,7 @@ namespace CameraOSC
         float Zoom { set; }
     }
 
-    public class UIManager : MonoBehaviour, IUIManager
+    public class UIManager : UIManageable, IUIManager
     {
         #region Inspector
         [SerializeField] private OscQueryManager oscQueryManager;
@@ -22,6 +25,8 @@ namespace CameraOSC
         [SerializeField] private TMPUI infoText;
         [Space]
         [SerializeField] private TMPUI poseText;
+        [Space]
+        [SerializeField] private Slider zoomSlider;
         [SerializeField] private TMPUI zoomText;
         [Space]
         [SerializeField] private TMP_InputField positionXText;
@@ -53,14 +58,13 @@ namespace CameraOSC
         #endregion
 
         #region Private Fields
-        private UserCamera userCamera;
         private int lastSentZoom = 0;
         private Vector3 lastPosition = Vector3.zero;
 
         #endregion
 
         #region Public Methods
-        public void SetInfoText(string text)
+        public override void SetInfoText(string text)
         {
             infoText.text = text;
         }
@@ -98,10 +102,6 @@ namespace CameraOSC
         #endregion
 
         #region Private Methods
-        internal void Initialize()
-        {
-            userCamera = oscQueryManager.userCamera;
-        }
 
         private void m_UpdateSpoutSource()
         {
@@ -144,21 +144,6 @@ namespace CameraOSC
 
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
         }
-
-        /*
-        private void MoveCamera()
-        {
-            float dx = Input.GetAxis("Horizontal");
-            float dy = Input.GetAxis("Vertical");
-            if (dx != 0 || dy != 0)
-            {
-                Vector3 pos = userCamera.Position;
-                pos.x += dx * Time.deltaTime * 5;
-                pos.y += dy * Time.deltaTime * 5;
-                userCamera.Send(pos, userCamera.Rotation);
-            }
-        }
-        */
         #endregion
     }
 }

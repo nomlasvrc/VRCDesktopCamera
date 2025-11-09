@@ -4,6 +4,7 @@ namespace CameraOSC
 {
     public abstract class DataReceivable : MonoBehaviour
     {
-        public abstract void InitializeDataReceiver();
+        internal protected UserCamera userCamera;
+        public virtual void InitializeDataReceiver() { }
     }
 }

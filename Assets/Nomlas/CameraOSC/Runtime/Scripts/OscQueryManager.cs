@@ -8,32 +8,66 @@ namespace CameraOSC
 {
     public class OscQueryManager : MonoBehaviour
     {
-        [SerializeField] private UIManager uiManager;
+        [SerializeField] private DataReceivable[] dataReceivables;
+        [SerializeField] private UIManageable uiManager;
 
         private OSCQueryService _oscQuery;
         private OscServer _receiver;
-        internal UserCamera userCamera { get; private set; }
+        private UserCamera userCamera;
         private const string SERVER_NAME = "VRCDesktopCamera";
-        internal static int portTCP = 9458;
-        internal static int portUDP = 9459;
+        private static int portTCP = 9458;
+        private static int portUDP = 9459;
 
-        void Start()
+        private void Start()
         {
             StartService();
         }
 
-        internal void StartService()
+        private void StartService()
         {
             portTCP = GetAvailableTcpPort();
             portUDP = GetAvailableUdpPort();
+
+            var serverName = SERVER_NAME;
+            var ipAddress = "127.0.0.1";
+            var oscPort = 9000;
+
+            // OSCQueryサービスを開始
+            StartOSCQueryService(serverName, ipAddress, oscPort, portTCP, portUDP);
+
+            uiManager.SetInfoText($@"OSCQuery Info:
+            Server Name: {serverName}
+            IP Address: {ipAddress}
+            OSC Port: {oscPort}
+            TCP Port: {portTCP}
+            UDP Port: {portUDP}
+            ");
+
+            // エンドポイントとメソッドを追加
+            AddEndpointsAndMethods();
+
+            // DataReceivableにUserCameraを設定
+            foreach (var receivable in dataReceivables)
+            {
+                receivable.InitializeDataReceiver();
+                receivable.userCamera = userCamera;
+                receivable.enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// OSCQueryサービスを開始します。
+        /// </summary>
+        private void StartOSCQueryService(string serverName, string ipAddress, int oscPort, int portTCP, int portUDP)
+        {
             _receiver = OscServer.GetOrCreate(portUDP);
 
-            userCamera = new UserCamera("127.0.0.1", 9000);
+            userCamera = new UserCamera(ipAddress, oscPort);
 
             IDiscovery discovery = new MeaModDiscovery();
 
             _oscQuery = new OSCQueryServiceBuilder()
-                .WithServiceName(SERVER_NAME)
+                .WithServiceName(serverName)
                 .WithHostIP(IPAddress.Loopback)
                 .WithOscIP(IPAddress.Loopback)
                 .WithTcpPort(portTCP)
@@ -45,17 +79,18 @@ namespace CameraOSC
                 .Build();
 
             _oscQuery.RefreshServices();
-
-            // Show server name and chosen port
-            uiManager.SetInfoText($"tcp: {portTCP}\nosc: {portUDP}");
-
-            AddMethods();
-
-            uiManager.Initialize();
         }
 
-        #region Sub Methods
-        private void AddMethods()
+        private void OnDestroy()
+        {
+            _receiver.Dispose();
+            _oscQuery.Dispose();
+        }
+
+        /// <summary>
+        /// OSCQueryのエンドポイントとメソッドを追加します。
+        /// </summary>
+        private void AddEndpointsAndMethods()
         {
             _receiver.TryAddMethod($"/usercamera/Mode", ReadMode);
             _oscQuery.AddEndpoint<int>("/usercamera/Mode", Attributes.AccessValues.ReadWrite);
@@ -82,6 +117,7 @@ namespace CameraOSC
             }
         }
 
+        #region Read Methods
         public void ReadMode(OscMessageValues message)
         {
             var mode = (UserCamera.CameraMode)message.ReadIntElement(0);
@@ -106,15 +142,9 @@ namespace CameraOSC
             float value = message.ReadFloatElement(0);
             userCamera.SetData(dataType, value);
         }
-
-        private void OnDestroy()
-        {
-            _receiver.Dispose();
-            _oscQuery.Dispose();
-        }
         #endregion
 
-        #region Static Methods
+        #region Port Utility
         private static readonly IPEndPoint DefaultLoopbackEndpoint = new IPEndPoint(IPAddress.Loopback, port: 0);
         public static int GetAvailableTcpPort()
         {
