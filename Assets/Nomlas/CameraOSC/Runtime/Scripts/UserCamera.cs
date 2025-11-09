@@ -1,6 +1,8 @@
 using OscCore;
 using UnityEngine;
 
+// VRChatのカメラに関するデータの保存・送信を行うクラス
+
 namespace CameraOSC
 {
     public interface IUserCamera

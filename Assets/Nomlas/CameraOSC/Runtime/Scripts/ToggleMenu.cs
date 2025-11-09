@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace CameraOSC
 {
+    /// <summary>
+    /// SubMenuの開閉を制御するクラス
+    /// </summary>
     [RequireComponent(typeof(Animator))]
     public class ToggleMenu : MonoBehaviour
     {
