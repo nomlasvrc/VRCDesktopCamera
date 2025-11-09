@@ -9,7 +9,7 @@ namespace CameraOSC
     public class ToggleMenu : MonoBehaviour
     {
         private Animator animator;
-        void Start()
+        private void Start()
         {
             animator = GetComponent<Animator>();
         }
