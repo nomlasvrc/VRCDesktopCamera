@@ -4840,7 +4840,7 @@ MonoBehaviour:
   dataReceivables:
   - {fileID: 1435269923}
   uiManager: {fileID: 1435269923}
-  oscReceiver: {fileID: 0}
+  oscReceiver: {fileID: 401481537}
 --- !u!1 &1305839502
 GameObject:
   m_ObjectHideFlags: 0
