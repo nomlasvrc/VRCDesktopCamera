@@ -98,7 +98,7 @@ namespace CameraOSC
         public override void InitializeDataReceiver()
         {
             base.InitializeDataReceiver();
-            // Hoge
+            UpdateSpoutSource();
         }
         
         private void Update()
