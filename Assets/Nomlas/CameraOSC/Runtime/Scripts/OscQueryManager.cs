@@ -9,7 +9,7 @@ namespace CameraOSC
     public class OscQueryManager : MonoBehaviour
     {
         [SerializeField] private DataReceivable[] dataReceivables;
-        [SerializeField] private UIManageable uiManager;
+        [SerializeField] private UIManager uiManager;
 
         private OSCQueryService _oscQuery;
         private OscServer _receiver;

@@ -10,16 +10,9 @@ using TMPUI = TMPro.TextMeshProUGUI;
 
 namespace CameraOSC
 {
-    public interface IUIManager
-    {
-        void SetInfoText(string text);
-        void Capture();
-        void UpdateSpoutSource();
-        float Zoom { set; }
-    }
-
-    public class UIManager : UIManageable, IUIManager
-    {
+    public class UIManager : DataReceivable
+    {     
+        // ----- Unity関連のコード -----
         #region Inspector
         [SerializeField] private OscQueryManager oscQueryManager;
         [SerializeField] private SpoutReceiver spoutReceiver;
@@ -48,27 +41,6 @@ namespace CameraOSC
                 userCamera.Send(UserCamera.FloatEndPoint.Zoom, v);
                 lastSentZoom = v;
             }
-        }
-        #endregion
-
-        #region Properties
-        public string SpoutSourceName
-        {
-            get => spoutReceiver.sourceName;
-            set => spoutReceiver.sourceName = value;
-        }
-        #endregion
-
-        #region Private Fields
-        private int lastSentZoom = 0;
-        private Vector3 lastPosition = Vector3.zero;
-
-        #endregion
-
-        #region Public Methods
-        public override void SetInfoText(string text)
-        {
-            infoText.text = text;
         }
         #endregion
 
@@ -102,14 +74,37 @@ namespace CameraOSC
             SpoutSourceName = newSourceName;
         }
 
-        /// <summary>
-        /// Spoutのソースリストを更新
-        /// GC Allocが発生するので頻繁に呼ばないこと
-        /// </summary>
-        public void UpdateSpoutSource() => m_UpdateSpoutSource();
+        public void UpdateSpoutSource() => m_UpdateSpoutSource(); // GC Allocが発生するので頻繁に呼ばないこと
         #endregion
 
-        #region Private Methods
+        // -------------------------------------------
+
+        #region Public API
+        public string SpoutSourceName
+        {
+            get => spoutReceiver.sourceName;
+            set => spoutReceiver.sourceName = value;
+        }
+
+        public void SetInfoText(string text)
+        {
+            infoText.text = text;
+        }
+        #endregion
+
+        private int lastSentZoom = 0;
+        private Vector3 lastPosition = Vector3.zero;
+
+        public override void InitializeDataReceiver()
+        {
+            base.InitializeDataReceiver();
+            // Hoge
+        }
+        
+        private void Update()
+        {
+            UpdateUIText();
+        }
 
         private void m_UpdateSpoutSource()
         {
@@ -133,11 +128,6 @@ namespace CameraOSC
             }
         }
 
-        private void Update()
-        {
-            UpdateUIText();
-        }
-
         private void UpdateUIText()
         {
             var pos = userCamera.Position;
@@ -152,6 +142,5 @@ namespace CameraOSC
 
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
         }
-        #endregion
     }
 }
