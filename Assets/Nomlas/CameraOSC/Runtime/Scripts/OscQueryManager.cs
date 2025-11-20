@@ -48,9 +48,9 @@ namespace CameraOSC
             // DataReceivableにUserCameraを設定
             foreach (var receivable in dataReceivables)
             {
-                receivable.InitializeDataReceiver();
                 receivable.userCamera = userCamera;
                 receivable.enabled = true;
+                receivable.InitializeDataReceiver();
             }
         }
 
