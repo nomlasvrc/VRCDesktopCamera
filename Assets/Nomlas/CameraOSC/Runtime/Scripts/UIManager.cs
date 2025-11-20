@@ -1,3 +1,4 @@
+using System.Linq;
 using Klak.Spout;
 using TMPro;
 using UnityEngine;
@@ -94,6 +95,12 @@ namespace CameraOSC
             userCamera.Send(UserCamera.CameraAction.Capture);
         }
 
+        public void OnChangeSpout()
+        {
+            var newSourceName = selectSourceDropdown.options[selectSourceDropdown.value].text;
+            spoutReceiver.sourceName = newSourceName;
+        }
+
         /// <summary>
         /// Spoutのソースリストを更新
         /// GC Allocが発生するので頻繁に呼ばないこと
@@ -111,7 +118,7 @@ namespace CameraOSC
             {
                 selectSourceDropdown.interactable = true;
                 selectSourceDropdown.ClearOptions();
-                selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string>(sources));
+                selectSourceDropdown.AddOptions(sources.ToList());
                 int currentIndex = System.Array.IndexOf(sources, spoutReceiver.sourceName);
                 if (currentIndex < 0) currentIndex = 0;
                 selectSourceDropdown.value = currentIndex;
@@ -124,6 +131,8 @@ namespace CameraOSC
                 selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string> { "No Source" });
             }
         }
+
+
 
         private void Update()
         {
