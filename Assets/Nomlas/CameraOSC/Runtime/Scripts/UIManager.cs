@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Klak.Spout;
 using TMPro;
@@ -51,7 +52,7 @@ namespace CameraOSC
         #endregion
 
         #region Properties
-        public string sourceName
+        public string SpoutSourceName
         {
             get => spoutReceiver.sourceName;
             set => spoutReceiver.sourceName = value;
@@ -98,7 +99,7 @@ namespace CameraOSC
         public void OnChangeSpout()
         {
             var newSourceName = selectSourceDropdown.options[selectSourceDropdown.value].text;
-            spoutReceiver.sourceName = newSourceName;
+            SpoutSourceName = newSourceName;
         }
 
         /// <summary>
@@ -119,10 +120,10 @@ namespace CameraOSC
                 selectSourceDropdown.interactable = true;
                 selectSourceDropdown.ClearOptions();
                 selectSourceDropdown.AddOptions(sources.ToList());
-                int currentIndex = System.Array.IndexOf(sources, spoutReceiver.sourceName);
+                int currentIndex = Array.IndexOf(sources, SpoutSourceName);
                 if (currentIndex < 0) currentIndex = 0;
                 selectSourceDropdown.value = currentIndex;
-                spoutReceiver.sourceName = sources[currentIndex];
+                SpoutSourceName = sources[currentIndex];
             }
             else
             {
@@ -131,8 +132,6 @@ namespace CameraOSC
                 selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string> { "No Source" });
             }
         }
-
-
 
         private void Update()
         {
