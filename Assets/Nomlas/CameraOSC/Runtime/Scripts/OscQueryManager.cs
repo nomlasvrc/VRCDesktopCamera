@@ -40,8 +40,7 @@ namespace CameraOSC
             IP Address: {ipAddress}
             OSC Port: {oscPort}
             TCP Port: {portTCP}
-            UDP Port: {portUDP}
-            ");
+            UDP Port: {portUDP}");
 
             // エンドポイントとメソッドを追加
             AddEndpointsAndMethods();
