@@ -11,7 +11,7 @@ using TMPUI = TMPro.TextMeshProUGUI;
 namespace CameraOSC
 {
     public class UIManager : DataReceivable
-    {     
+    {
         // ----- Unity関連のコード -----
         #region Inspector
         [SerializeField] private OscQueryManager oscQueryManager;
@@ -93,17 +93,11 @@ namespace CameraOSC
         #endregion
 
         private int lastSentZoom = 0;
-        private Vector3 lastPosition = Vector3.zero;
 
         public override void InitializeDataReceiver()
         {
             base.InitializeDataReceiver();
             UpdateSpoutSource();
-        }
-        
-        private void Update()
-        {
-            UpdateUIText();
         }
 
         private void m_UpdateSpoutSource()
@@ -128,18 +122,19 @@ namespace CameraOSC
             }
         }
 
-        private void UpdateUIText()
+        public override void OnChangePose()
         {
+            Debug.Log("UIManager OnChangePose");
             var pos = userCamera.Position;
-            if (pos != lastPosition)
-            {
-                poseText.text = $"Position: {pos}\nRotation: {userCamera.Rotation}";
-                positionXText.SetTextWithoutNotify(pos.x.ToString("F2"));
-                positionYText.SetTextWithoutNotify(pos.y.ToString("F2"));
-                positionZText.SetTextWithoutNotify(pos.z.ToString("F2"));
-                lastPosition = pos;
-            }
+            poseText.text = $"Position: {pos}\nRotation: {userCamera.Rotation}";
+            positionXText.SetTextWithoutNotify(pos.x.ToString("F2"));
+            positionYText.SetTextWithoutNotify(pos.y.ToString("F2"));
+            positionZText.SetTextWithoutNotify(pos.z.ToString("F2"));
+        }
 
+        public override void OnChangeFloat()
+        {
+            Debug.Log("UIManager OnChangeFloat");
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
         }
     }

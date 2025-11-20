@@ -91,10 +91,10 @@ namespace CameraOSC
         /// </summary>
         private void AddEndpointsAndMethods()
         {
-            _receiver.TryAddMethod($"/usercamera/Mode", ReadMode);
+            _receiver.TryAddMethodPair($"/usercamera/Mode", ReadMode, () => {foreach (var r in dataReceivables) { r.OnChangeMode(); }});
             _oscQuery.AddEndpoint<int>("/usercamera/Mode", Attributes.AccessValues.ReadWrite);
 
-            _receiver.TryAddMethod($"/usercamera/Pose", ReadPose);
+            _receiver.TryAddMethodPair($"/usercamera/Pose", ReadPose, () => {foreach (var r in dataReceivables) { r.OnChangePose(); }});
             _oscQuery.AddEndpoint<float>("/usercamera/Pose", Attributes.AccessValues.ReadWrite);
 
             _oscQuery.AddEndpoint<bool>("/usercamera/Close", Attributes.AccessValues.WriteOnly);
@@ -104,14 +104,14 @@ namespace CameraOSC
             for (int i = 0; i < UserCamera.BoolEndPoint_Count; i++)
             {
                 var dataType = (UserCamera.BoolEndPoint)i;
-                _receiver.TryAddMethod($"/usercamera/{dataType}", (message) => ReadBool(message, dataType));
+                _receiver.TryAddMethodPair($"/usercamera/{dataType}", (message) => ReadBool(message, dataType), () => {foreach (var r in dataReceivables) { r.OnChangeBool(); }});
                 _oscQuery.AddEndpoint<bool>($"/usercamera/{dataType}", Attributes.AccessValues.ReadWrite);
             }
 
             for (int i = 0; i < UserCamera.FloatEndPoint_Count; i++)
             {
                 var dataType = (UserCamera.FloatEndPoint)i;
-                _receiver.TryAddMethod($"/usercamera/{dataType}", (message) => ReadFloat(message, dataType));
+                _receiver.TryAddMethodPair($"/usercamera/{dataType}", (message) => ReadFloat(message, dataType), () => {foreach (var r in dataReceivables) { r.OnChangeFloat(); }});
                 _oscQuery.AddEndpoint<float>($"/usercamera/{dataType}", Attributes.AccessValues.ReadWrite);
             }
         }
