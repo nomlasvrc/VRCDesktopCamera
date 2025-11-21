@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.stella3d.osccore": {
+      "version": "https://github.com/vrchat/OscCore.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a4df29620a79dbbee587c8e7650d03fe4f469582"
+    },
     "com.unity.2d.animation": {
       "version": "10.2.1",
       "depth": 1,
