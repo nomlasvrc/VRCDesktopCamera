@@ -13,10 +13,7 @@ namespace CameraOSC
             _receiver = OscServer.GetOrCreate(portUDP);
         }
 
-        internal void TryAddMethodPair(string address, Action<OscMessageValues> read, Action mainThread)
-        {
-            _receiver.TryAddMethodPair(address, new OscActionPair(read, mainThread));
-        }
+        internal void TryAddMethod(string address, Action<OscMessageValues> read) => _receiver.TryAddMethod(address, read);
 
         private void OnDestroy()
         {

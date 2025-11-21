@@ -122,19 +122,14 @@ namespace CameraOSC
             }
         }
 
-        public override void OnChangePose()
+        public override void OnChange()
         {
-            Debug.Log("UIManager OnChangePose");
             var pos = userCamera.Position;
             poseText.text = $"Position: {pos}\nRotation: {userCamera.Rotation}";
             positionXText.SetTextWithoutNotify(pos.x.ToString("F2"));
             positionYText.SetTextWithoutNotify(pos.y.ToString("F2"));
             positionZText.SetTextWithoutNotify(pos.z.ToString("F2"));
-        }
-
-        public override void OnChangeFloat()
-        {
-            Debug.Log("UIManager OnChangeFloat");
+            
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
         }
     }

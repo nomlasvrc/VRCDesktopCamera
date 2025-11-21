@@ -23,6 +23,18 @@ namespace CameraOSC
             StartService();
         }
 
+        private void Update()
+        {
+            if (received)
+            {
+                foreach (var receivable in dataReceivables)
+                {
+                    receivable.OnChange();
+                }
+                received = false;
+            }
+        }
+
         private void StartService()
         {
             portTCP = GetAvailableTcpPort();
@@ -90,10 +102,10 @@ namespace CameraOSC
         /// </summary>
         private void AddEndpointsAndMethods()
         {
-            oscReceiver.TryAddMethodPair($"/usercamera/Mode", ReadMode, ReadModeMainThread);
+            oscReceiver.TryAddMethod($"/usercamera/Mode", ReadMode);
             _oscQuery.AddEndpoint<int>("/usercamera/Mode", Attributes.AccessValues.ReadWrite);
 
-            oscReceiver.TryAddMethodPair($"/usercamera/Pose", ReadPose, ReadPoseMainThread);
+            oscReceiver.TryAddMethod($"/usercamera/Pose", ReadPose);
             _oscQuery.AddEndpoint<float>("/usercamera/Pose", Attributes.AccessValues.ReadWrite);
 
             _oscQuery.AddEndpoint<bool>("/usercamera/Close", Attributes.AccessValues.WriteOnly);
@@ -103,47 +115,48 @@ namespace CameraOSC
             for (int i = 0; i < UserCamera.BoolEndPoint_Count; i++)
             {
                 var dataType = (UserCamera.BoolEndPoint)i;
-                oscReceiver.TryAddMethodPair($"/usercamera/{dataType}", (message) => ReadBool(message, dataType), ReadBoolMainThread);
+                oscReceiver.TryAddMethod($"/usercamera/{dataType}", (message) => ReadBool(message, dataType));
                 _oscQuery.AddEndpoint<bool>($"/usercamera/{dataType}", Attributes.AccessValues.ReadWrite);
             }
 
             for (int i = 0; i < UserCamera.FloatEndPoint_Count; i++)
             {
                 var dataType = (UserCamera.FloatEndPoint)i;
-                oscReceiver.TryAddMethodPair($"/usercamera/{dataType}", (message) => ReadFloat(message, dataType), ReadFloatMainThread);
+                oscReceiver.TryAddMethod($"/usercamera/{dataType}", (message) => ReadFloat(message, dataType));
                 _oscQuery.AddEndpoint<float>($"/usercamera/{dataType}", Attributes.AccessValues.ReadWrite);
             }
         }
 
         #region Read Methods
+        private bool received;
         public void ReadMode(OscMessageValues message)
         {
             var mode = (UserCamera.CameraMode)message.ReadIntElement(0);
             userCamera.SetData(mode);
+            received = true;
         }
-        public void ReadModeMainThread() { foreach (var r in dataReceivables) { r.OnChangeMode(); }}
 
         public void ReadPose(OscMessageValues message)
         {
             var position = new Vector3(message.ReadFloatElement(0), message.ReadFloatElement(1), message.ReadFloatElement(2));
             var rotation = new Vector3(message.ReadFloatElement(3), message.ReadFloatElement(4), message.ReadFloatElement(5));
             userCamera.SetData(position, rotation);
+            received = true;
         }
-        public void ReadPoseMainThread() {foreach (var r in dataReceivables) { r.OnChangePose(); }}
 
         public void ReadBool(OscMessageValues message, UserCamera.BoolEndPoint dataType)
         {
             bool value = message.ReadBooleanElement(0);
             userCamera.SetData(dataType, value);
+            received = true;
         }
-        public void ReadBoolMainThread() { foreach (var r in dataReceivables) { r.OnChangeBool(); } }
 
         public void ReadFloat(OscMessageValues message, UserCamera.FloatEndPoint dataType)
         {
             float value = message.ReadFloatElement(0);
             userCamera.SetData(dataType, value);
+            received = true;
         }
-        public void ReadFloatMainThread() { foreach (var r in dataReceivables) { r.OnChangeFloat(); } }
         #endregion
 
         #region Port Utility

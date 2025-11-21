@@ -7,9 +7,6 @@ namespace CameraOSC
         internal protected UserCamera userCamera;
         public virtual void InitializeDataReceiver() { }
 
-        public virtual void OnChangeMode() { }
-        public virtual void OnChangePose() { }
-        public virtual void OnChangeBool() { }
-        public virtual void OnChangeFloat() { }
+        public virtual void OnChange() { }
     }
 }
