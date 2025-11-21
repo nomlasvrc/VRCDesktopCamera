@@ -637,7 +637,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 334778025}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9821574
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5172,10 +5172,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 2146612625}
   m_HandleRect: {fileID: 710798837}
   m_Direction: 2
-  m_MinValue: 20
-  m_MaxValue: 300
+  m_MinValue: 0
+  m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 30
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -5254,7 +5254,6 @@ MonoBehaviour:
   oscQueryManager: {fileID: 1305032389}
   spoutReceiver: {fileID: 640022297}
   infoText: {fileID: 439948936}
-  poseText: {fileID: 1921953658}
   zoomSlider: {fileID: 1363700598}
   zoomText: {fileID: 1773223268}
   positionXText: {fileID: 1737510353}
@@ -6264,7 +6263,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00047215537}
+  m_AnchoredPosition: {x: 0, y: 2.269521}
   m_SizeDelta: {x: 0, y: 500}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1822598323
@@ -7090,9 +7089,9 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 27493943}
+  - {fileID: 1434026446}
   - {fileID: 640022296}
   - {fileID: 1305032388}
   - {fileID: 401481538}
-  - {fileID: 1434026446}
   - {fileID: 1435269924}
   - {fileID: 425799232}

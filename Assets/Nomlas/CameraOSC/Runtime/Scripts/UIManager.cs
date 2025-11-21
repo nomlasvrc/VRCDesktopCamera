@@ -19,8 +19,6 @@ namespace CameraOSC
         [Space]
         [SerializeField] private TMPUI infoText;
         [Space]
-        [SerializeField] private TMPUI poseText;
-        [Space]
         [SerializeField] private Slider zoomSlider;
         [SerializeField] private TMPUI zoomText;
         [Space]
@@ -36,10 +34,11 @@ namespace CameraOSC
         {
             set
             {
-                var v = Mathf.RoundToInt(value);
+                var v = Mathf.RoundToInt(Mathf.Pow(280, value) + 20);
                 if (lastSentZoom == v) return;
                 userCamera.Send(UserCamera.FloatEndPoint.Zoom, v);
                 lastSentZoom = v;
+                lastEditZoomTime = Time.time;
             }
         }
         #endregion
@@ -93,10 +92,13 @@ namespace CameraOSC
         #endregion
 
         private int lastSentZoom = 0;
+        private float lastEditZoomTime;
+        private const float zoomEditDelay = 0.4f;
 
         public override void InitializeDataReceiver()
         {
             base.InitializeDataReceiver();
+            lastEditZoomTime = Time.time;
             UpdateSpoutSource();
         }
 
@@ -125,12 +127,15 @@ namespace CameraOSC
         public override void OnChange()
         {
             var pos = userCamera.Position;
-            poseText.text = $"Position: {pos}\nRotation: {userCamera.Rotation}";
             positionXText.SetTextWithoutNotify(pos.x.ToString("F2"));
             positionYText.SetTextWithoutNotify(pos.y.ToString("F2"));
             positionZText.SetTextWithoutNotify(pos.z.ToString("F2"));
             
             zoomText.text = $"{Mathf.RoundToInt(userCamera.Zoom)}°";
+            if (lastEditZoomTime + zoomEditDelay < Time.time)
+            {
+                zoomSlider.SetValueWithoutNotify(MathF.Log(userCamera.Zoom - 20, 280));
+            }
         }
     }
 }
