@@ -27,6 +27,8 @@ namespace CameraOSC
         [SerializeField] private TMP_InputField positionZText;
         [Space]
         [SerializeField] private TMP_Dropdown selectSourceDropdown;
+        [Space]
+        [SerializeField] private Slider aspectRatioSlider;
         #endregion
 
         #region UI Properties
@@ -82,7 +84,11 @@ namespace CameraOSC
         public string SpoutSourceName
         {
             get => spoutReceiver.sourceName;
-            set => spoutReceiver.sourceName = value;
+            set
+            {
+                spoutReceiver.sourceName = value;
+                UpdateAspectRatio(value);
+            }
         }
 
         public void SetInfoText(string text)
@@ -121,6 +127,18 @@ namespace CameraOSC
                 selectSourceDropdown.interactable = false;
                 selectSourceDropdown.ClearOptions();
                 selectSourceDropdown.AddOptions(new System.Collections.Generic.List<string> { "No Source" });
+            }
+        }
+
+        private void UpdateAspectRatio(string newSourceName)
+        {
+            if (newSourceName.StartsWith("VRCSender"))
+            {
+                aspectRatioSlider.value = 16 / 9f;
+            }
+            else if (newSourceName.StartsWith("VRCFaceCamSender"))
+            {
+                aspectRatioSlider.value = 1;
             }
         }
 
